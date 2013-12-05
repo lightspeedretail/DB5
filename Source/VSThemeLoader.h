@@ -15,7 +15,12 @@
 
 @property (nonatomic, strong, readonly) VSTheme *defaultTheme;
 @property (nonatomic, strong, readonly) NSArray *themes;
+@property (nonatomic, copy, readwrite) NSString *imageFolderPath;
 
 - (VSTheme *)themeNamed:(NSString *)themeName;
+
+- (id)initWithFileAtPath:(NSString *)themesFilePath;
+
+- (void)handleThemeFileChangesWithBlock:(void (^)())handler;
 
 @end

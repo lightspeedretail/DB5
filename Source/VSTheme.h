@@ -24,6 +24,7 @@ typedef NS_ENUM(NSUInteger, VSTextCaseTransform) {
 
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, weak) VSTheme *parentTheme; /*can inherit*/
+@property (nonatomic, copy) NSString *imageFolderPath;
 
 - (BOOL)boolForKey:(NSString *)key;
 - (NSString *)stringForKey:(NSString *)key;

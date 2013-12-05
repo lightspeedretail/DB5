@@ -13,7 +13,8 @@
 @interface DB5ViewController ()
 
 @property (strong, nonatomic) IBOutlet UILabel *label;
-@property (nonatomic, strong) VSTheme *theme;
+@property (getter = isLoaded) BOOL loaded;
+@property CGPoint initialLabelOrigin;
 
 @end
 
@@ -28,22 +29,34 @@
 		return nil;
 
 	_theme = theme;
+    _loaded = NO;
 
 	return self;
 }
 
 
 - (void)viewDidLoad {
+    
+    self.loaded = YES;
+    self.initialLabelOrigin = self.label.frame.origin;
+    
+    [self applyTheme:self.theme];
+}
 
-	self.view.backgroundColor = [self.theme colorForKey:@"backgroundColor"];
-	self.label.textColor = [self.theme colorForKey:@"labelTextColor"];
-	self.label.font = [self.theme fontForKey:@"labelFont"];
+- (void)applyTheme:(VSTheme *)theme {
+    
+    self.view.backgroundColor = [theme colorForKey:@"backgroundColor"];
+	self.label.textColor = [theme colorForKey:@"labelTextColor"];
+	self.label.font = [theme fontForKey:@"labelFont"];
 
-	[self.theme animateWithAnimationSpecifierKey:@"labelAnimation" animations:^{
-
+    CGPoint themeLabelOrigin = [theme pointForKey:@"label"];
+    CGPoint newLabelOrigin = CGPointEqualToPoint(self.label.frame.origin, themeLabelOrigin) ? self.initialLabelOrigin : themeLabelOrigin;
+    
+	[theme animateWithAnimationSpecifierKey:@"labelAnimation" animations:^{
+        
 		CGRect rLabel = self.label.frame;
-		rLabel.origin = [self.theme pointForKey:@"label"];
-
+		rLabel.origin = newLabelOrigin;
+        
 		self.label.frame = rLabel;
 		
 	} completion:^(BOOL finished) {
@@ -51,6 +64,12 @@
 	}];
 }
 
-
+- (void)setTheme:(VSTheme *)theme {
+    
+    if (self.isLoaded) {
+        [self applyTheme:theme];
+    }
+    _theme = theme;
+}
 
 @end

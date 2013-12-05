@@ -13,6 +13,7 @@
 
 @interface DB5ViewController : UIViewController
 
+@property (nonatomic, strong) VSTheme *theme;
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil theme:(VSTheme *)theme;
 

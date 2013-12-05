@@ -45,8 +45,16 @@ static UIColor *colorWithHexString(NSString *hexString);
 - (id)objectForKey:(NSString *)key {
 
 	id obj = [self.themeDictionary valueForKeyPath:key];
-	if (obj == nil && self.parentTheme != nil)
-		obj = [self.parentTheme objectForKey:key];
+    
+    VSTheme *strongParentTheme = self.parentTheme;
+    if (obj == nil && strongParentTheme != nil)
+		obj = [strongParentTheme objectForKey:key];
+    if ([obj isKindOfClass:[NSString class]]) {
+        NSString *objString = (NSString *)obj;
+        if ([objString characterAtIndex:0] == '$' && objString.length > 1) {
+            obj = [strongParentTheme objectForKey:[(NSString *)obj substringFromIndex:1]];
+        }
+    }
 	return obj;
 }
 
@@ -105,8 +113,15 @@ static UIColor *colorWithHexString(NSString *hexString);
 	NSString *imageName = [self stringForKey:key];
 	if (stringIsEmpty(imageName))
 		return nil;
+    
+    UIImage *image;
+    if (self.imageFolderPath) {
+        image = [UIImage imageWithContentsOfFile:[self.imageFolderPath stringByAppendingPathComponent:imageName]];
+    } else {
+        image = [UIImage imageNamed:imageName];
+    }
 	
-	return [UIImage imageNamed:imageName];
+    return image;
 }
 
 
@@ -276,11 +291,16 @@ static UIColor *colorWithHexString(NSString *hexString) {
 	NSString *redString = [s substringToIndex:2];
 	NSString *greenString = [s substringWithRange:NSMakeRange(2, 2)];
 	NSString *blueString = [s substringWithRange:NSMakeRange(4, 2)];
+	NSString *alphaString = @"ff";
+	if (s.length == 8) {
+		alphaString = [s substringWithRange:NSMakeRange(6, 2)];
+	}
 
-	unsigned int red = 0, green = 0, blue = 0;
+	unsigned int red = 0, green = 0, blue = 0, alpha = 0;
 	[[NSScanner scannerWithString:redString] scanHexInt:&red];
 	[[NSScanner scannerWithString:greenString] scanHexInt:&green];
 	[[NSScanner scannerWithString:blueString] scanHexInt:&blue];
+	[[NSScanner scannerWithString:alphaString] scanHexInt:&alpha];
 
-	return [UIColor colorWithRed:(CGFloat)red/255.0f green:(CGFloat)green/255.0f blue:(CGFloat)blue/255.0f alpha:1.0f];
+	return [UIColor colorWithRed:(CGFloat)red/255.0f green:(CGFloat)green/255.0f blue:(CGFloat)blue/255.0f alpha:alpha/255.0f];
 }
