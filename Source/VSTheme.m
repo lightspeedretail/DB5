@@ -115,10 +115,10 @@ static UIColor *colorWithHexString(NSString *hexString);
 		return nil;
     
     UIImage *image;
-    if (self.imageFolderPath) {
-        image = [UIImage imageWithContentsOfFile:[self.imageFolderPath stringByAppendingPathComponent:imageName]];
-    } else {
+    if (stringIsEmpty(self.imageFolderPath)) {
         image = [UIImage imageNamed:imageName];
+    } else {
+        image = [UIImage imageWithContentsOfFile:[self.imageFolderPath stringByAppendingPathComponent:imageName]];
     }
 	
     return image;
