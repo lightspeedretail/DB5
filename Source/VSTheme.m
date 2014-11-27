@@ -10,7 +10,7 @@
 
 
 static BOOL stringIsEmpty(NSString *s);
-static UIColor *colorWithHexString(NSString *hexString);
+static UIColor *colorWithHexString(NSString *hexString, CGFloat defaultAlpha);
 
 
 @interface VSTheme ()
@@ -130,9 +130,12 @@ static UIColor *colorWithHexString(NSString *hexString);
 	UIColor *cachedColor = [self.colorCache objectForKey:key];
 	if (cachedColor != nil)
 		return cachedColor;
-    
+
+    id alphaObj = [self objectForKey:[key stringByAppendingString:@"Alpha"]];
+    CGFloat alpha = alphaObj == nil ? 1.0 : [alphaObj floatValue];
+
 	NSString *colorString = [self stringForKey:key];
-	UIColor *color = colorWithHexString(colorString);
+	UIColor *color = colorWithHexString(colorString, alpha);
 	if (color == nil)
 		color = [UIColor blackColor];
 
@@ -277,7 +280,7 @@ static BOOL stringIsEmpty(NSString *s) {
 }
 
 
-static UIColor *colorWithHexString(NSString *hexString) {
+static UIColor *colorWithHexString(NSString *hexString, CGFloat defaultAlpha) {
 
 	/*Picky. Crashes by design.*/
 	
@@ -291,7 +294,7 @@ static UIColor *colorWithHexString(NSString *hexString) {
 	NSString *redString = [s substringToIndex:2];
 	NSString *greenString = [s substringWithRange:NSMakeRange(2, 2)];
 	NSString *blueString = [s substringWithRange:NSMakeRange(4, 2)];
-	NSString *alphaString = @"ff";
+    NSString *alphaString = [NSString stringWithFormat:@"%2x", (unsigned int)(defaultAlpha * 255)];
 	if (s.length == 8) {
 		alphaString = [s substringWithRange:NSMakeRange(6, 2)];
 	}
